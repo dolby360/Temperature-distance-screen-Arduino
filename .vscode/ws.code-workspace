@@ -1,0 +1,52 @@
+{
+	"folders": [
+		{
+			"name": "Temperture",
+			"path": "C:\\Users\\benahard\\Downloads\\Personal\\Temperture"
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"iostream": "cpp",
+			"string": "cpp",
+			"util.h": "c",
+			"sstream": "cpp",
+			"array": "cpp",
+			"*.tcc": "cpp",
+			"cctype": "cpp",
+			"clocale": "cpp",
+			"cmath": "cpp",
+			"cstdint": "cpp",
+			"cstdio": "cpp",
+			"cstdlib": "cpp",
+			"ctime": "cpp",
+			"cwchar": "cpp",
+			"cwctype": "cpp",
+			"deque": "cpp",
+			"unordered_map": "cpp",
+			"vector": "cpp",
+			"exception": "cpp",
+			"fstream": "cpp",
+			"functional": "cpp",
+			"initializer_list": "cpp",
+			"iomanip": "cpp",
+			"iosfwd": "cpp",
+			"istream": "cpp",
+			"limits": "cpp",
+			"new": "cpp",
+			"ostream": "cpp",
+			"numeric": "cpp",
+			"stdexcept": "cpp",
+			"streambuf": "cpp",
+			"type_traits": "cpp",
+			"tuple": "cpp",
+			"typeinfo": "cpp",
+			"utility": "cpp",
+			"locale": "cpp"
+		},
+		"terminal.integrated.env.windows": {
+			"PATH": "C:\\Users\\benahard\\.platformio\\penv\\Scripts;C:\\Users\\benahard\\.platformio\\penv;C:\\Program Files\\RA2HP\\;C:\\ProgramData\\Oracle\\Java\\javapath;C:\\windows\\system32;C:\\windows;C:\\windows\\System32\\Wbem;C:\\windows\\System32\\WindowsPowerShell\\v1.0\\;C:\\Program Files\\dotnet\\;C:\\Program Files\\Git\\cmd;C:\\Program Files\\nodejs\\;C:\\Program Files\\TortoiseGit\\bin;C:\\Program Files\\Microsoft SQL Server\\130\\Tools\\Binn\\;C:\\Program Files (x86)\\Intel\\Intel(R) Management Engine Components\\DAL;C:\\Program Files\\Intel\\Intel(R) Management Engine Components\\DAL;C:\\MinGW\\bin;C:\\Program Files\\CMake\\bin;C:\\Program Files (x86)\\GnuWin32\\bin;C:\\Users\\benahard\\AppData\\Local\\Microsoft\\WindowsApps;C:\\Users\\benahard\\AppData\\Local\\Programs\\Microsoft VS Code\\bin;C:\\Users\\benahard\\AppData\\Roaming\\npm;;C:\\Program Files\\RA2HP\\;C:\\ProgramData\\Oracle\\Java\\javapath;C:\\windows\\system32;C:\\windows;C:\\windows\\System32\\Wbem;C:\\windows\\System32\\WindowsPowerShell\\v1.0\\;C:\\Program Files\\dotnet\\;C:\\Program Files\\Git\\cmd;C:\\Program Files\\nodejs\\;C:\\Program Files\\TortoiseGit\\bin;C:\\Program Files\\Microsoft SQL Server\\130\\Tools\\Binn\\;C:\\Program Files (x86)\\Intel\\Intel(R) Management Engine Components\\DAL;C:\\Program Files\\Intel\\Intel(R) Management Engine Components\\DAL;C:\\MinGW\\bin;C:\\Program Files\\CMake\\bin;C:\\Program Files (x86)\\GnuWin32\\bin;C:\\Users\\benahard\\AppData\\Local\\Microsoft\\WindowsApps;C:\\Users\\benahard\\AppData\\Local\\Programs\\Microsoft VS Code\\bin;C:\\Users\\benahard\\AppData\\Roaming\\npm;",
+			"PLATFORMIO_CALLER": "vscode"
+		}
+	}
+}
