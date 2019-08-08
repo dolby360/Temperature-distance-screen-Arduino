@@ -11,16 +11,25 @@ distanceSensor* ds;
 temp* tempSens; 
 screen* myScreen;
 
+volatile unsigned long lastTimeInterrupted; 
+volatile int counter1 = 0;
+volatile int counter2 = 0;
+
+void ICACHE_RAM_ATTR buttonPressed();
+
 void setup()
 {         
   Serial.begin(115200);
-  pinMode(D8,INPUT);
   
   ds        = new distanceSensor(&myTimer);
   tempSens  = new temp(&myTimer);
   myScreen  = new screen(&myTimer);
 
   myScreen->setTemperatureSensor(tempSens);
+  myScreen->setDistanceSensor(ds);
+
+  lastTimeInterrupted = millis();
+  attachInterrupt(digitalPinToInterrupt(D5), buttonPressed, RISING);
 }
 
 void loop(){
@@ -28,3 +37,11 @@ void loop(){
 }
 
 
+void buttonPressed(){
+  unsigned long timeNow = millis();
+  if(timeNow - lastTimeInterrupted < 1000){
+    return;
+  }
+  myScreen->toggleState();
+  lastTimeInterrupted = millis();
+}

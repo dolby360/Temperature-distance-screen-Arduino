@@ -8,7 +8,6 @@ screen::screen(timer* myTimer,unsigned int interval)
     lcd->init();  
     lcd->backlight();
     lcd->home();
-    lcd->print("Hi");
 
     this->lastTempValue = 0;
     this->lastHumidity = 0;
@@ -21,23 +20,42 @@ void screen::setTemperatureSensor(temp* tempSens){
     this->tempSens = tempSens;
 }
 
+void screen::setDistanceSensor(distanceSensor* ds){
+    this->ds = ds;
+}
+
+void screen::toggleState(){
+    this->currentState = static_cast<state>( (static_cast<int>(this->currentState) + 1) % (DISTANCE + 1) );
+    this->forceUpdate = true;
+}
+
 void screen::setState(state newState){
     this->currentState = newState;
     this->forceUpdate = true;
 }
 
 void screen::update(){
+    // Serial.println(static_cast<int>(this->currentState));
     switch(this->currentState){
         case DISTANCE:
+            updateDistance();
         break;
         case TEMP_HUMI:
             updateTempAndHumidity();
-            Serial.println("TEMP_HUMI");
         break;
         default:
         break;
     }
     forceUpdate = false;
+}
+
+void screen::updateDistance(){
+    lcd->clear();
+    lcd->home();
+    lcd->print("Distance:");
+    lcd->setCursor(11,0);
+    int dist = ds->getDistance();
+    lcd->print( String(dist) );
 }
 
 void screen::updateTempAndHumidity(){
@@ -60,6 +78,5 @@ void screen::updateTempAndHumidity(){
     lcd->print("Temperature:");
     lcd->setCursor(0, 3);
     lcd->print(String(  (int)  temp)  );
-
 }
 
