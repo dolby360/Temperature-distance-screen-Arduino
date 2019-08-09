@@ -1,6 +1,6 @@
 #include "Arduino.h"
 #include "../include/stdfx.hpp"
-#include "../include/util.hpp"
+
 #include "../include/timer.hpp"
 #include "../include/distanceSensor.hpp"
 #include "../include/Temperature.hpp"
@@ -27,6 +27,7 @@ void setup()
 
   myScreen->setTemperatureSensor(tempSens);
   myScreen->setDistanceSensor(ds);
+  //ds->setScreen(myScreen);
 
   lastTimeInterrupted = millis();
   attachInterrupt(digitalPinToInterrupt(D5), buttonPressed, RISING);

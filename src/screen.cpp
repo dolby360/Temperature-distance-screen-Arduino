@@ -14,6 +14,8 @@ screen::screen(timer* myTimer,unsigned int interval)
 
     this->currentState = TEMP_HUMI;
     this->forceUpdate = true;
+    this->sleeping = false;
+    this->startTimeFromWakeUp = millis();
 }
 
 void screen::setTemperatureSensor(temp* tempSens){
@@ -27,6 +29,7 @@ void screen::setDistanceSensor(distanceSensor* ds){
 void screen::toggleState(){
     this->currentState = static_cast<state>( (static_cast<int>(this->currentState) + 1) % (DISTANCE + 1) );
     this->forceUpdate = true;
+    //Serial.println( static_cast<int>(this->currentState) );
 }
 
 void screen::setState(state newState){
@@ -34,26 +37,49 @@ void screen::setState(state newState){
     this->forceUpdate = true;
 }
 
+void screen::wakeUp(){
+    if(false == this->sleeping){
+        return;
+    }
+    this->sleeping = false;
+    //lcd->on();
+}
+
+void screen::checkIfNeedToSleep(){
+    unsigned long timeNow = millis();
+    if(timeNow - this->startTimeFromWakeUp > 6000){
+        //this->sleeping = true;
+        //lcd->off();
+    }
+}
+
 void screen::update(){
+    if(sleeping){
+        
+        return;
+    }
     // Serial.println(static_cast<int>(this->currentState));
     switch(this->currentState){
         case DISTANCE:
+            //Serial.println("Distance");
             updateDistance();
         break;
         case TEMP_HUMI:
+            //Serial.println("Temp");
             updateTempAndHumidity();
         break;
         default:
         break;
     }
     forceUpdate = false;
+    checkIfNeedToSleep();
 }
 
 void screen::updateDistance(){
     lcd->clear();
-    lcd->home();
+    lcd->setCursor(0,1);
     lcd->print("Distance:");
-    lcd->setCursor(11,0);
+    lcd->setCursor(11,1);
     int dist = ds->getDistance();
     lcd->print( String(dist) );
 }

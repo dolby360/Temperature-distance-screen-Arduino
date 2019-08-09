@@ -1,10 +1,12 @@
 #ifndef __DISTANCE_SENSOR__
 #define __DISTANCE_SENSOR__
 
-class observer;
-
 #include "stdfx.hpp"
 #include "timer.hpp"
+#include "screen.hpp"
+#include <map>
+
+class screen;
 
 class distanceSensor : public observer{
     public:
@@ -12,9 +14,20 @@ class distanceSensor : public observer{
         ~distanceSensor();
         void update();
         int getDistance();
+        void setScreen(screen* myScreen);
+        String childName(){
+            return "distanceSensor";
+        }
     private:
-        SharpIR* sensor;
+        std::map<int,int> sensorValueToCm;
+        screen* myScreen;   
+        void wakeUpTheScreen();
+        int calcAvgAs_cm();
+        unsigned int* buff;
+        int avgDistance;
+        int buffSize;
         int distance;
+        int buffIndex;
 };
 
 

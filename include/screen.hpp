@@ -1,5 +1,3 @@
-
-
 #ifndef __SCREEN__
 #define __SCREEN__
 
@@ -7,6 +5,8 @@
 #include "timer.hpp"
 #include "Temperature.hpp"
 #include "distanceSensor.hpp"
+
+class distanceSensor;
 
 class screen : public observer{
     
@@ -20,6 +20,10 @@ class screen : public observer{
         void setTemperatureSensor(temp* tempSens); 
         void setDistanceSensor(distanceSensor* ds);
         void toggleState();
+        void wakeUp();
+        String childName(){
+            return "screen";
+        }
     private:
         temp* tempSens;
         distanceSensor* ds;
@@ -28,11 +32,13 @@ class screen : public observer{
         void setState(state newState);
         void updateTempAndHumidity();
         void updateDistance();
+        void checkIfNeedToSleep();
         float lastTempValue;
         float lastHumidity; 
         state currentState;
-
+        unsigned long startTimeFromWakeUp;
         bool forceUpdate;
+        bool sleeping;
 };
 
 #endif

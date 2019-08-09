@@ -11,6 +11,9 @@ class temp : public observer{
         void update();
         float getHumidity();
         float getTemperature();
+        String childName(){
+            return "temp";
+        }
     private:
         DHT* dht;
         float humidity;

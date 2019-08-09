@@ -6,7 +6,7 @@
 #include <string>
 #include <LiquidCrystal_I2C.h>
 #include "DHT.h"
-#include <SharpIR.h>
+
 #include <Wire.h> 
 #include <iomanip>
 #include <locale>
