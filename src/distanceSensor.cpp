@@ -25,7 +25,7 @@ distanceSensor::distanceSensor(timer* myTimer,int interval)
 }
 
 void distanceSensor::wakeUpTheScreen(){
-    //myScreen->wakeUp();
+    myScreen->wakeUp();
 }
 
 void distanceSensor::setScreen(screen* myScreen){

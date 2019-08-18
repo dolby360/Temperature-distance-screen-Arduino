@@ -10,7 +10,7 @@ class screen;
 
 class distanceSensor : public observer{
     public:
-        distanceSensor(timer* myTimer,int interval = 100);
+        distanceSensor(timer* myTimer,int interval = 50);
         ~distanceSensor();
         void update();
         int getDistance();

@@ -7,7 +7,7 @@
 
 class temp : public observer{
     public: 
-        temp(timer* myTimer,int interval = 3000);
+        temp(timer* myTimer,int interval = 1500);
         void update();
         float getHumidity();
         float getTemperature();

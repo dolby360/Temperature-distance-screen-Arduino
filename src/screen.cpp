@@ -16,6 +16,7 @@ screen::screen(timer* myTimer,unsigned int interval)
     this->forceUpdate = true;
     this->sleeping = false;
     this->startTimeFromWakeUp = millis();
+    this->timeToStayAwake = 10000;
 }
 
 void screen::setTemperatureSensor(temp* tempSens){
@@ -38,24 +39,25 @@ void screen::setState(state newState){
 }
 
 void screen::wakeUp(){
+    
     if(false == this->sleeping){
         return;
     }
     this->sleeping = false;
-    //lcd->on();
+    this->startTimeFromWakeUp = millis();
+    lcd->backlight();
 }
 
 void screen::checkIfNeedToSleep(){
     unsigned long timeNow = millis();
-    if(timeNow - this->startTimeFromWakeUp > 6000){
-        //this->sleeping = true;
-        //lcd->off();
+    if(timeNow - this->startTimeFromWakeUp > this->timeToStayAwake){
+        this->sleeping = true;
+        lcd->noBacklight();
     }
 }
 
 void screen::update(){
     if(sleeping){
-        
         return;
     }
     // Serial.println(static_cast<int>(this->currentState));
@@ -94,6 +96,8 @@ void screen::updateTempAndHumidity(){
         ){
         return;
     }
+    lastTempValue = temp;
+    lastHumidity = humi;
 
     lcd->clear();
     lcd->home();

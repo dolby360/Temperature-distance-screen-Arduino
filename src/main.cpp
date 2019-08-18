@@ -5,11 +5,13 @@
 #include "../include/distanceSensor.hpp"
 #include "../include/Temperature.hpp"
 #include "../include/screen.hpp"
+#include "../include/Wifi.hpp"
 
 timer myTimer;
 distanceSensor* ds;
 temp* tempSens; 
 screen* myScreen;
+wifiServer* myWifi;
 
 volatile unsigned long lastTimeInterrupted; 
 volatile int counter1 = 0;
@@ -24,10 +26,11 @@ void setup()
   ds        = new distanceSensor(&myTimer);
   tempSens  = new temp(&myTimer);
   myScreen  = new screen(&myTimer);
+  myWifi    = new wifiServer(&myTimer);
 
   myScreen->setTemperatureSensor(tempSens);
   myScreen->setDistanceSensor(ds);
-  //ds->setScreen(myScreen);
+  ds->setScreen(myScreen);
 
   lastTimeInterrupted = millis();
   attachInterrupt(digitalPinToInterrupt(D5), buttonPressed, RISING);

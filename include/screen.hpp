@@ -15,7 +15,7 @@ class screen : public observer{
             TEMP_HUMI,
             DISTANCE,
         };
-        screen(timer* myTimer,unsigned int interval = 500);
+        screen(timer* myTimer,unsigned int interval = 100);
         void update();
         void setTemperatureSensor(temp* tempSens); 
         void setDistanceSensor(distanceSensor* ds);
@@ -39,6 +39,7 @@ class screen : public observer{
         unsigned long startTimeFromWakeUp;
         bool forceUpdate;
         bool sleeping;
+        unsigned int timeToStayAwake;
 };
 
 #endif

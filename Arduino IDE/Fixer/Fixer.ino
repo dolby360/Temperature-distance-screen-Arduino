@@ -1,32 +1,73 @@
-#define sensor A0 // Sharp IR GP2Y0A41SK0F (4-30cm, analog)
+/*
+   Copyright (c) 2015, Majenko Technologies
+   All rights reserved.
 
-#define bufSize 500
-unsigned int valuesBuffer[bufSize]; 
+   Redistribution and use in source and binary forms, with or without modification,
+   are permitted provided that the following conditions are met:
 
-void printAvgBuffer();
-int bufIndex;
+ * * Redistributions of source code must retain the above copyright notice, this
+     list of conditions and the following disclaimer.
+
+ * * Redistributions in binary form must reproduce the above copyright notice, this
+     list of conditions and the following disclaimer in the documentation and/or
+     other materials provided with the distribution.
+
+ * * Neither the name of Majenko Technologies nor the names of its
+     contributors may be used to endorse or promote products derived from
+     this software without specific prior written permission.
+
+   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+   ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+   WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+   DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
+   ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+   (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+   LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+   ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+   (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
+/* Create a WiFi access point and provide a web server on it. */
+
+#include <ESP8266WiFi.h>
+#include <WiFiClient.h>
+#include <ESP8266WebServer.h>
+
+#ifndef APSSID
+#define APSSID "123456789"
+#define APPSK  "123456789"
+#endif
+
+/* Set these to your desired credentials. */
+const char *ssid = APSSID;
+const char *password = APPSK;
+
+ESP8266WebServer server(80);
+
+/* Just a little test message.  Go to http://192.168.4.1 in a web browser
+   connected to this access point to see it.
+*/
+void handleRoot() {
+  server.send(200, "text/plain","HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n<!DOCTYPE HTML><html><body><h2>Hello World</h2></body></html>");
+}
 
 void setup() {
-  Serial.begin(115200); // start the serial port
-  int bufIndex = 0;
+  delay(1000);
+  Serial.begin(115200);
+  Serial.println();
+  Serial.print("Configuring access point...");
+  /* You can remove the password parameter if you want the AP to be open. */
+  WiFi.softAP(ssid, password);
+
+  IPAddress myIP = WiFi.softAPIP();
+  Serial.print("AP IP address: ");
+  Serial.println(myIP);
+  server.on("/", handleRoot);
+  server.begin();
+  Serial.println("HTTP server started");
 }
 
-void loop() {  
-  unsigned int val = analogRead(A0);
-  valuesBuffer[bufIndex] = val;
-  bufIndex = (bufIndex + 1) % (bufSize + 1);
-  if(bufIndex == bufSize){
-    printAvgBuffer();
-  }
-}
-
-
-void printAvgBuffer(){
-  int avg = 0;
-  int sum = 0;
-  for(int i = 0; i < bufSize; i++){
-    sum += valuesBuffer[i];
-  }
-  avg = sum / bufSize;
-  Serial.println(avg);
+void loop() {
+  server.handleClient();
 }
