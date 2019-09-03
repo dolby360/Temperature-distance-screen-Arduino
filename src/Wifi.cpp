@@ -19,6 +19,7 @@ void wifiServer::update(){
     // Wait for connection
     if(WiFi.status() != WL_CONNECTED) {
         // Serial.print(".");
+        this->ipAdress = "";
         return;
     }else{
         server->handleClient();
@@ -29,7 +30,9 @@ void wifiServer::update(){
     // Serial.println(ssid);
     // Serial.print("IP address: ");
     // Serial.println(WiFi.localIP());
-
+    this->ipAdress =  WiFi.localIP().toString();
+    // Serial.println(this->ipAdress);
+    
     if (MDNS.begin("esp8266")) {
         Serial.println("MDNS responder started");
     }
@@ -39,10 +42,27 @@ void wifiServer::update(){
     });
     server->onNotFound(handleNotFound);
     server->begin();
-    Serial.println("HTTP server started");
+    // Serial.println("HTTP server started");
 }
 
 void wifiServer::handleRoot(){
+    if(false == server->hasArg("plain")){
+        Serial.println("Has not");
+        Serial.println(server->argName(0));
+        server->send(200, "text/plain", "no args");
+        return;
+    }
+    Serial.println(server->arg("plain"));
+    String input = server->arg("plain");
+    DynamicJsonDocument doc(1024);
+    deserializeJson(doc, input);
+    JsonObject obj = doc.as<JsonObject>();
+    String f = obj[String("firstParam")];
+    String s = obj[String("secondParam")];
+
+    Serial.println(f);
+    Serial.println(s);
+
     server->send(200, "text/plain", "hello from esp8266!");
 }
 

@@ -27,9 +27,14 @@ void screen::setDistanceSensor(distanceSensor* ds){
     this->ds = ds;
 }
 
+void screen::setWifi(wifiServer* wifi){
+    this->wifi = wifi;
+}
+
 void screen::toggleState(){
-    this->currentState = static_cast<state>( (static_cast<int>(this->currentState) + 1) % (DISTANCE + 1) );
+    this->currentState = static_cast<state>( (static_cast<int>(this->currentState) + 1) % (LAST_STATE + 1) );
     this->forceUpdate = true;
+    this->firstTimeInThisState = true;
     //Serial.println( static_cast<int>(this->currentState) );
 }
 
@@ -70,11 +75,32 @@ void screen::update(){
             //Serial.println("Temp");
             updateTempAndHumidity();
         break;
+        case WIFI:
+            wifiUpdateMethod();
+        break;
+        case LAST_STATE:
+            toggleState();
+        break;
         default:
         break;
     }
+    this->firstTimeInThisState = false;
     forceUpdate = false;
     checkIfNeedToSleep();
+}
+
+void screen::wifiUpdateMethod(){
+    if( this->firstTimeInThisState == false &&
+        lastIPValue == wifi->getIPAddress()){
+        return;
+    }
+    lcd->clear();
+    lcd->setCursor(0,1);
+    lcd->print("IP address:");
+    lcd->setCursor(0,2);
+    String ip = wifi->getIPAddress();
+    lcd->print( ip );
+    lastIPValue = ip;
 }
 
 void screen::updateDistance(){

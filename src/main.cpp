@@ -30,6 +30,7 @@ void setup()
 
   myScreen->setTemperatureSensor(tempSens);
   myScreen->setDistanceSensor(ds);
+  myScreen->setWifi(myWifi);
   ds->setScreen(myScreen);
 
   lastTimeInterrupted = millis();
@@ -40,12 +41,14 @@ void loop(){
   myTimer.updateTimer();
 }
 
-
 void buttonPressed(){
   unsigned long timeNow = millis();
   if(timeNow - lastTimeInterrupted < 1000){
     return;
   }
-  myScreen->toggleState();
+  if(false == myScreen->isSleeping()){
+    myScreen->toggleState();
+  }
+  myScreen->wakeUp();
   lastTimeInterrupted = millis();
 }
