@@ -35,7 +35,7 @@ void screen::toggleState(){
     this->currentState = static_cast<state>( (static_cast<int>(this->currentState) + 1) % (LAST_STATE + 1) );
     this->forceUpdate = true;
     this->firstTimeInThisState = true;
-    //Serial.println( static_cast<int>(this->currentState) );
+    // Serial.println( static_cast<int>(this->currentState) );
 }
 
 void screen::setState(state newState){
@@ -46,6 +46,7 @@ void screen::setState(state newState){
 void screen::wakeUp(){
     
     if(false == this->sleeping){
+        this->startTimeFromWakeUp = millis();
         return;
     }
     this->sleeping = false;
@@ -54,12 +55,18 @@ void screen::wakeUp(){
 }
 
 void screen::checkIfNeedToSleep(){
+    //in case there is some connection 
+    //do not go to sleep.
+    if(wifi->getIPAddress() != ""){
+        return;
+    }
     unsigned long timeNow = millis();
     if(timeNow - this->startTimeFromWakeUp > this->timeToStayAwake){
         this->sleeping = true;
         lcd->noBacklight();
     }
 }
+
 
 void screen::update(){
     if(sleeping){
@@ -87,20 +94,6 @@ void screen::update(){
     this->firstTimeInThisState = false;
     forceUpdate = false;
     checkIfNeedToSleep();
-}
-
-void screen::wifiUpdateMethod(){
-    if( this->firstTimeInThisState == false &&
-        lastIPValue == wifi->getIPAddress()){
-        return;
-    }
-    lcd->clear();
-    lcd->setCursor(0,1);
-    lcd->print("IP address:");
-    lcd->setCursor(0,2);
-    String ip = wifi->getIPAddress();
-    lcd->print( ip );
-    lastIPValue = ip;
 }
 
 void screen::updateDistance(){
@@ -136,3 +129,77 @@ void screen::updateTempAndHumidity(){
     lcd->print(String(  (int)  temp)  );
 }
 
+
+void screen::write4blockCharacter(){
+    int a = 0;
+    int b = a + 1;
+    int c = a + 2;
+    lcd->setCursor(a,1);
+    lcd->write(0);
+    lcd->setCursor(a,0);
+    lcd->write(1);
+    lcd->setCursor(b,1);
+    lcd->write(2);
+    lcd->setCursor(b,0);
+    lcd->write(3);
+    lcd->setCursor(c,1);
+    lcd->write(4);
+    lcd->setCursor(c,0);
+    lcd->write(5);
+}
+
+void screen::buildChar(){
+    std::vector<std::vector<byte>> vec = this->getMuse();
+    unsigned int i = 0;
+    for(i = 0; i < vec.size(); i++){
+        lcd->createChar(i, this->vectorToByteArray( vec[i] ) );
+    }
+}
+
+
+void screen::wifiState_showChar(bool forceUpdate){
+    if(false == forceUpdate){
+        if(wifi->getState() == wifiLastState){ return; }
+    }
+
+    lcd->clear();
+    buildChar();
+    write4blockCharacter();
+
+    return;
+}
+
+void screen::wifiState_showIP(bool forceUpdate){
+    if(false == forceUpdate){
+        if( wifi->getState() == wifiLastState &&
+            lastIPValue == wifi->getIPAddress()){ 
+                return; 
+            }
+    }
+
+    lcd->clear();
+    lcd->setCursor(0,1);
+    lcd->print("IP address:");
+    lcd->setCursor(0,2);
+    String ip = wifi->getIPAddress();
+    lcd->print( ip );
+    lastIPValue = ip;
+}
+
+void screen::wifiUpdateMethod(){
+    wifiServer::state currentState = wifi->getState();
+
+    switch(currentState){
+        case wifiServer::state::IP_ADDRESS :
+            wifiState_showIP(this->firstTimeInThisState);
+        break;
+        case wifiServer::state::CHARACTERS :
+            wifiState_showChar(this->firstTimeInThisState);
+        break;
+        case wifiServer::state::LAST_STATE:
+        break;
+        default:
+        break;
+    }
+    wifiLastState = currentState;
+}

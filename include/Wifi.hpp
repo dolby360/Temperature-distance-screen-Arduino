@@ -18,8 +18,8 @@
 
 class wifiServer : public observer{
     public:
-        //Don't go blew 0.5s with interval value
-        wifiServer(timer* myTimer,int interval = 1000);
+        static wifiServer* getInstance();
+        static wifiServer* getInstanceAndTryToSetTimer(timer* myTimer);
         void update();
         void sendPlainText(String str);
         String childName(){
@@ -29,13 +29,33 @@ class wifiServer : public observer{
             return this->ipAdress;
         }
 
+        enum state{
+            IP_ADDRESS,
+            CHARACTERS,
+            LAST_STATE,
+        };
+        state getState(){
+            return myState;
+        }
+        static JsonObject getArgs();
+        static String getArgsAsString();
     private:
+        //Don't go blew 0.5s with interval value
+        wifiServer(timer* myTimer,int interval = 1000);
+
         static void handleRoot();
         static void handleNotFound();
+        
+
+        void toggleState();
+        state myState;
         const char* ssid;
         const char* password;
         String ipAdress;
         static ESP8266WebServer* server;
+        
+        static wifiServer* instance;
+        bool handleClientFlag;
 };
 
 

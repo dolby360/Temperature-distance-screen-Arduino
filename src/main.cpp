@@ -26,8 +26,7 @@ void setup()
   ds        = new distanceSensor(&myTimer);
   tempSens  = new temp(&myTimer);
   myScreen  = new screen(&myTimer);
-  myWifi    = new wifiServer(&myTimer);
-
+  myWifi    = wifiServer::getInstanceAndTryToSetTimer(&myTimer);
   myScreen->setTemperatureSensor(tempSens);
   myScreen->setDistanceSensor(ds);
   myScreen->setWifi(myWifi);
@@ -39,6 +38,10 @@ void setup()
 
 void loop(){
   myTimer.updateTimer();
+  // if(counter1 != counter2){
+  //   Serial.println(counter1);
+  //   counter2 = counter1;
+  // }
 }
 
 void buttonPressed(){
@@ -46,6 +49,7 @@ void buttonPressed(){
   if(timeNow - lastTimeInterrupted < 1000){
     return;
   }
+  counter1 +=1;
   if(false == myScreen->isSleeping()){
     myScreen->toggleState();
   }
