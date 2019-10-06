@@ -33,25 +33,30 @@ class screen : public observer , public screenCharacter{
         String childName(){
             return "screen";
         }
-    private:
+    protected:
         wifiServer* wifi;
         temp* tempSens;
         distanceSensor* ds;
         LiquidCrystal_I2C* lcd;
-
+        int cellCounter;
         void setState(state newState);
         void updateTempAndHumidity();
         void updateDistance();
         void checkIfNeedToSleep();
 
-        /**********  WIFI section **********/
+        /*****Wifi section*****/
+
         wifiServer::state wifiLastState;
         void wifiUpdateMethod();
         void write4blockCharacter();
         void buildChar();
         void wifiState_showIP(bool forceUpdate);
         void wifiState_showChar(bool forceUpdate);
-        /**********************************/
+        void wifiState_createCharacter(bool forceUpdate);
+
+
+        /******************/
+
         float lastTempValue;
         float lastHumidity; 
         String lastIPValue;

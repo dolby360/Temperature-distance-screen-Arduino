@@ -186,6 +186,20 @@ void screen::wifiState_showIP(bool forceUpdate){
     lastIPValue = ip;
 }
 
+void screen::wifiState_createCharacter(bool forceUpdate){
+    if( wifiServer::getInstance()->isCreatureUpdated() == false ){
+        return;
+    }
+    wifiServer::getInstance()->setCreatureUpdated();
+    std::vector<byte> cell = wifiServer::getInstance()->getCellArray();
+    int row = wifiServer::getInstance()->getRow();
+    int col = wifiServer::getInstance()->getCol();
+    Serial.println("Update");
+    lcd->createChar(this->cellCounter, this->vectorToByteArray( cell ) );
+    lcd->setCursor(col,row);
+    lcd->write(this->cellCounter++);
+}
+
 void screen::wifiUpdateMethod(){
     wifiServer::state currentState = wifi->getState();
 
@@ -196,10 +210,19 @@ void screen::wifiUpdateMethod(){
         case wifiServer::state::CHARACTERS :
             wifiState_showChar(this->firstTimeInThisState);
         break;
+        case wifiServer::state::CREATE_YOUR_OWN_CREATURE:
+            wifiState_createCharacter(this->firstTimeInThisState);
+        break; 
         case wifiServer::state::LAST_STATE:
         break;
         default:
         break;
     }
     wifiLastState = currentState;
+    if(  wifiServer::getInstance()->getClearScreen()   ){
+        Serial.println("clear");
+        lcd->clear();
+        this->cellCounter = 0;
+        wifiServer::getInstance()->setScreenCleared();
+    }
 }
