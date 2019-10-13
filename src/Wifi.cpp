@@ -22,14 +22,15 @@ wifiServer* wifiServer::getInstanceAndTryToSetTimer(timer* myTimer)
         instance = new wifiServer(myTimer);
         instance->clearScreen = false;
         instance->creatureUpdated = false;
+        instance->creatureToShow = wifiServer::WALKING_MAN;
+        instance->randomSymbolUpdated = true;
     }
     return instance;
 }
 
 
 
-wifiServer::wifiServer(timer* myTimer,int interval):
-observer(myTimer,interval){
+wifiServer::wifiServer(timer* myTimer,int interval):observer(myTimer,interval){
     server = new ESP8266WebServer(80);
     const char* ssid = STASSID;
     const char* password = STAPSK;
@@ -71,6 +72,8 @@ void wifiServer::update(){
         server->on("/",wifiServer::handleRoot);
         server->on("/createChar",wifiServer::handleCreateChar);
         server->on("/clearScreen",wifiServer::handleClearScreen);
+        server->on("/setCreature",wifiServer::handleSetCreature);
+        server->on("/updateLocation",wifiServer::updateLocation);
         server->onNotFound(handleNotFound);
         server->begin();
         this->ipAdress =  WiFi.localIP().toString();
@@ -78,6 +81,17 @@ void wifiServer::update(){
         Serial.println("IP address: ");
         Serial.println(this->ipAdress);
     }
+}
+
+void wifiServer::setNewRowAndCol(String _row,String _col){
+    this->creatureUpdated = true;
+
+    sscanf(_row.c_str(), "%d", &(this->row));
+    sscanf(_col.c_str(), "%d", &(this->col));
+    Serial.print("update row:   ");
+    Serial.println(this->row);
+    Serial.print("update col:   ");
+    Serial.println(this->col);
 }
 
 void wifiServer::storeNewCreatureData(String _row,String _col,String _cell){
@@ -100,8 +114,41 @@ void wifiServer::storeNewCreatureData(String _row,String _col,String _cell){
     // Serial.println(this->col); 
 }
 
+void wifiServer::setChooseCreatureData(String _row,String _col,String _creature){
+    this->creatureUpdated = true;
+    sscanf(_row.c_str(), "%d", &(this->row));
+    sscanf(_col.c_str(), "%d", &(this->col));
+    Serial.println( "update:  " + _creature);
+    if(_creature == "walkingMan"){
+        setCreatureToShow(wifiServer::creatures::WALKING_MAN);
+    }
+    if(_creature == "smile"){
+        setCreatureToShow(wifiServer::creatures::SMILE);
+    }
+    if(_creature == "thumbDown"){
+        setCreatureToShow(wifiServer::creatures::THUMB_DOWN);
+    }
+    if(_creature == "roulette"){
+        setCreatureToShow(wifiServer::creatures::ROULETTE);
+        wifiServer::getInstance()->setRandomSymbolUpdated(true);
+    }
+}
+
+void wifiServer::handleSetCreature(){
+    Serial.println("Choose creature");
+    String input = wifiServer::getArgsAsString();
+    DynamicJsonDocument doc(1024);
+    deserializeJson(doc, input);
+    JsonObject obj = doc.as<JsonObject>();
+    String creature          = obj[String("creature")];
+    String row          = obj[String("row")];
+    String col          = obj[String("col")];
+    server->send(200, "text/plain", "OK");
+    wifiServer::getInstance()->setChooseCreatureData(row,col,creature);
+}
 
 void wifiServer::handleCreateChar(){
+    Serial.println("Create Char");
     String input = wifiServer::getArgsAsString();
     DynamicJsonDocument doc(1024);
     deserializeJson(doc, input);
@@ -117,8 +164,20 @@ void wifiServer::handleCreateChar(){
     // Serial.println(cellArray);
 }
 
+void wifiServer::updateLocation(){
+    Serial.println("Update Location");
+    String input = wifiServer::getArgsAsString();
+    DynamicJsonDocument doc(1024);
+    deserializeJson(doc, input);
+    JsonObject obj = doc.as<JsonObject>();
+    String row          = obj[String("row")];
+    String col          = obj[String("col")];
+    server->send(200, "text/plain", "OK");
+    wifiServer::getInstance()->setNewRowAndCol(row,col);
+}
 
 void wifiServer::handleRoot(){
+    Serial.println("Root");
     String input = wifiServer::getArgsAsString();
     DynamicJsonDocument doc(1024);
     deserializeJson(doc, input);
@@ -126,6 +185,8 @@ void wifiServer::handleRoot(){
     String state = obj[String("state")];
     if(state == "createCreature"){
         wifiServer::getInstance()->myState = CREATE_YOUR_OWN_CREATURE;
+    }else if(state == "choosePicture"){
+        wifiServer::getInstance()->myState = CHOOSE_CHARACTER;
     }
     server->send(200, "text/plain", "OK");
 }

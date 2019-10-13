@@ -6,12 +6,14 @@
 #include "../include/Temperature.hpp"
 #include "../include/screen.hpp"
 #include "../include/Wifi.hpp"
+#include "../include/led.hpp"
 
 timer myTimer;
 distanceSensor* ds;
 temp* tempSens; 
 screen* myScreen;
 wifiServer* myWifi;
+led* myLed;
 
 volatile unsigned long lastTimeInterrupted; 
 volatile int counter1 = 0;
@@ -27,6 +29,9 @@ void setup()
   tempSens  = new temp(&myTimer);
   myScreen  = new screen(&myTimer);
   myWifi    = wifiServer::getInstanceAndTryToSetTimer(&myTimer);
+  myLed     = new led(&myTimer);
+  myLed->setTemp(tempSens);
+  
   myScreen->setTemperatureSensor(tempSens);
   myScreen->setDistanceSensor(ds);
   myScreen->setWifi(myWifi);
@@ -34,6 +39,9 @@ void setup()
 
   lastTimeInterrupted = millis();
   attachInterrupt(digitalPinToInterrupt(D5), buttonPressed, RISING);
+
+  pinMode(D7, OUTPUT);
+  
 }
 
 void loop(){

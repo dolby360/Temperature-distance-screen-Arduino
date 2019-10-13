@@ -31,7 +31,7 @@ class wifiServer : public observer{
 
         enum state{
             IP_ADDRESS,
-            CHARACTERS,
+            CHOOSE_CHARACTER,
             CREATE_YOUR_OWN_CREATURE,
             LAST_STATE,
         };
@@ -48,12 +48,25 @@ class wifiServer : public observer{
         bool isCreatureUpdated(){return creatureUpdated;}
         void setCreatureUpdated(){ this->creatureUpdated = false;}
         /****************************/
+        bool isRandomSymbolUpdated(){return randomSymbolUpdated;}
+        void setRandomSymbolUpdated(bool value){ this->randomSymbolUpdated = value;}
 
+        /********set creature********/
+        enum creatures{
+            WALKING_MAN,
+            SMILE,
+            THUMB_DOWN,
+            ROULETTE,
+        };
+        void setCreatureToShow(creatures value){this->creatureToShow = value;}
+        creatures getCreatureToShow(){return this->creatureToShow;}
+        void setChooseCreatureData(String _row,String _col,String _creature);
+        /****************************/
         bool getClearScreen(){return this->clearScreen;}
         void setScreenCleared(){this->clearScreen = false;}
     private:
         //Don't go blew 0.5s with interval value
-        wifiServer(timer* myTimer,int interval = 1000);
+        wifiServer(timer* myTimer,int interval = 650);
         static void handleClearScreen(){
             wifiServer::getInstance()->clearScreen = true;
             server->send(200, "text/plain", "OK");
@@ -61,12 +74,19 @@ class wifiServer : public observer{
         bool clearScreen;
         static void handleRoot();
         static void handleNotFound();
+        static void updateLocation();
+        /********set creature********/
+        static void handleSetCreature();
+        creatures creatureToShow;
+        /****************************/
         /****Create new creature*****/
         static void handleCreateChar();
         void storeNewCreatureData(String _row,String _col,String _cell);
+        void setNewRowAndCol(String _row,String _col);
         int row;
         int col;
         bool creatureUpdated;
+        bool randomSymbolUpdated;
         std::vector<byte> cellArray;
         /****************************/
         void toggleState();

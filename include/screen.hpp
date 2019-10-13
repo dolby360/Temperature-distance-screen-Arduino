@@ -37,8 +37,8 @@ class screen : public observer , public screenCharacter{
         wifiServer* wifi;
         temp* tempSens;
         distanceSensor* ds;
-        LiquidCrystal_I2C* lcd;
-        int cellCounter;
+        
+        
         void setState(state newState);
         void updateTempAndHumidity();
         void updateDistance();
@@ -48,12 +48,15 @@ class screen : public observer , public screenCharacter{
 
         wifiServer::state wifiLastState;
         void wifiUpdateMethod();
-        void write4blockCharacter();
-        void buildChar();
+        void write6blockCharacter();
+        void write6blockCharacterStandartWay();
+        void write8blockCharacter();
+        void testChar();
+        void buildChar(std::vector<std::vector<byte>> vec);
         void wifiState_showIP(bool forceUpdate);
         void wifiState_showChar(bool forceUpdate);
         void wifiState_createCharacter(bool forceUpdate);
-
+        void setRandomChar(int rand);
 
         /******************/
 

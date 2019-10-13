@@ -129,27 +129,50 @@ void screen::updateTempAndHumidity(){
     lcd->print(String(  (int)  temp)  );
 }
 
-
-void screen::write4blockCharacter(){
-    int a = 0;
+void screen::write6blockCharacterStandartWay(){
+    int row = wifiServer::getInstance()->getRow();
+    int col = wifiServer::getInstance()->getCol();
+    int a = col;
     int b = a + 1;
     int c = a + 2;
-    lcd->setCursor(a,1);
+    lcd->setCursor(a,row + 0);
     lcd->write(0);
-    lcd->setCursor(a,0);
+    lcd->setCursor(b,row + 0);
     lcd->write(1);
-    lcd->setCursor(b,1);
+    lcd->setCursor(c,row + 0);
     lcd->write(2);
-    lcd->setCursor(b,0);
+    lcd->setCursor(a,row + 1);
     lcd->write(3);
-    lcd->setCursor(c,1);
+    lcd->setCursor(b,row + 1);
     lcd->write(4);
-    lcd->setCursor(c,0);
+    lcd->setCursor(c,row + 1);
     lcd->write(5);
 }
 
-void screen::buildChar(){
-    std::vector<std::vector<byte>> vec = this->getMuse();
+void screen::write6blockCharacter(){
+    int row = wifiServer::getInstance()->getRow();
+    int col = wifiServer::getInstance()->getCol();
+    int a = col;
+    int b = a + 1;
+    int c = a + 2;
+    lcd->setCursor(a,row + 1);
+    lcd->write(0);
+    lcd->setCursor(a,row + 0);
+    lcd->write(1);
+    lcd->setCursor(b,row + 1);
+    lcd->write(2);
+    lcd->setCursor(b,row + 0);
+    lcd->write(3);
+    lcd->setCursor(c,row + 1);
+    lcd->write(4);
+    lcd->setCursor(c,row + 0);
+    lcd->write(5);
+}
+
+void screen::testChar(){
+}
+
+void screen::buildChar(std::vector<std::vector<byte>> vec){
     unsigned int i = 0;
     for(i = 0; i < vec.size(); i++){
         lcd->createChar(i, this->vectorToByteArray( vec[i] ) );
@@ -158,15 +181,79 @@ void screen::buildChar(){
 
 
 void screen::wifiState_showChar(bool forceUpdate){
+    long rand;
     if(false == forceUpdate){
-        if(wifi->getState() == wifiLastState){ return; }
+        if( wifiServer::getInstance()->isCreatureUpdated() == false ){
+            return;
+        }
+        wifiServer::getInstance()->setCreatureUpdated();
+    }
+    Serial.print("creature state:   ");
+    Serial.println( static_cast<int>(  wifiServer::getInstance()->getCreatureToShow()  ) );
+    switch ( wifiServer::getInstance()->getCreatureToShow() )
+    {
+        case wifiServer::creatures::WALKING_MAN :
+            lcd->clear();
+            buildChar(this->getWalkingMan());
+            write6blockCharacter();
+            break;
+        case wifiServer::creatures::SMILE:
+            lcd->clear();
+            Serial.println("->Smile<-");
+            buildChar(this->getSmile());
+            write6blockCharacterStandartWay();
+            break;
+        case wifiServer::creatures::THUMB_DOWN:
+            lcd->clear();
+            buildChar(this->thumbDown());
+            write6blockCharacter();
+            break;
+        case wifiServer::creatures::ROULETTE:
+            rand = random(0,6);
+            setRandomChar(rand);
+            break;
+        default:
+            break;
     }
 
-    lcd->clear();
-    buildChar();
-    write4blockCharacter();
-
+    
     return;
+}
+
+void screen::setRandomChar(int rand){
+    if(wifiServer::getInstance()->isRandomSymbolUpdated() == false){
+        return;
+    }
+    wifiServer::getInstance()->setRandomSymbolUpdated(false);
+
+    int row = wifiServer::getInstance()->getRow();
+    int col = wifiServer::getInstance()->getCol();
+    switch (rand)
+    {
+    case 0:
+        drawDuck(row,col);
+    break;
+    case 1:
+        drawNote(row,col);
+    break;
+    case 2:
+        drawBell(row,col);
+    break;
+    case 3:
+        drawClock(row,col);
+    break;
+    case 4:
+        drawHeart(row,col);
+    break;
+    case 5:
+        drawCheck(row,col);
+    break;
+    case 6:
+        drawCross(row,col);
+    break;
+    default:
+        break;
+    }
 }
 
 void screen::wifiState_showIP(bool forceUpdate){
@@ -203,11 +290,16 @@ void screen::wifiState_createCharacter(bool forceUpdate){
 void screen::wifiUpdateMethod(){
     wifiServer::state currentState = wifi->getState();
 
+    if(wifiLastState != currentState){
+        Serial.print("wifi state:   ");
+        Serial.println( static_cast<int>(  currentState  ) );
+    }
+
     switch(currentState){
         case wifiServer::state::IP_ADDRESS :
             wifiState_showIP(this->firstTimeInThisState);
         break;
-        case wifiServer::state::CHARACTERS :
+        case wifiServer::state::CHOOSE_CHARACTER :
             wifiState_showChar(this->firstTimeInThisState);
         break;
         case wifiServer::state::CREATE_YOUR_OWN_CREATURE:
