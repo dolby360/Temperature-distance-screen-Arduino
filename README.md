@@ -8,7 +8,7 @@
 <br/>
 I develop this program on visual studio and I used platformIO so if you try to run this I recommend to do the same setup.<br/>
 
-## Short brief on the architecture and implementation 
+## Short brief about the architecture and implementation 
 
 ### main
 Initialize all components and handle the interrupt, also call the main notification function, we will get to the design pattern latter, but notice that in the main loop we call just one method.
